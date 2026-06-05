@@ -1,4 +1,4 @@
-const API_BASE = 'http://localhost:8000';
+const API_BASE = 'https://expense-tracker-2-4o4e.onrender.com';
 
 function getTokens() {
     return {

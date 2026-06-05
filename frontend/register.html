@@ -63,7 +63,7 @@
             btn.textContent = 'Creating account...';
 
             try {
-                const res = await fetch('http://localhost:8000/auth/register', {
+                const res = await fetch('https://expense-tracker-2-4o4e.onrender.com/auth/register', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ name, age: age ? parseInt(age) : null, email, password }),

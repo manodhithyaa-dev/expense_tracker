@@ -64,7 +64,7 @@ async function exportCSV(type) {
     const token = localStorage.getItem('access_token');
 
     try {
-        const res = await fetch(`http://localhost:8000/export/csv/${type}?start_date=${sd}&end_date=${ed}`, {
+        const res = await fetch(`https://expense-tracker-2-4o4e.onrender.com/export/csv/${type}?start_date=${sd}&end_date=${ed}`, {
             headers: { Authorization: `Bearer ${token}` },
         });
         if (!res.ok) throw new Error('Export failed');
