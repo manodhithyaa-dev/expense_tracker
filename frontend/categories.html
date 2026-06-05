@@ -19,6 +19,7 @@
             <a href="expenses.html"><span class="icon">&#36;</span> Expenses</a>
             <a href="income.html"><span class="icon">&#8593;</span> Income</a>
             <a href="budgets.html"><span class="icon">&#128176;</span> Budgets</a>
+            <a href="profile.html"><span class="icon">&#9881;</span> Profile</a>
         </nav>
         <div class="sidebar-footer">
             <a href="#" id="logoutBtn"><span class="icon">&#8592;</span> Logout</a>
@@ -49,15 +50,19 @@
             <div class="content-grid">
                 <div class="card">
                     <div class="card-header">
-                        <h3>Create Category</h3>
+                        <h3 id="categoryFormTitle">Create Category</h3>
                     </div>
                     <div class="card-body">
                         <form id="categoryForm">
+                            <input type="hidden" id="editCategoryId" value="">
                             <div class="form-group">
                                 <label for="categoryName">Category Name</label>
                                 <input type="text" id="categoryName" class="form-control" placeholder="e.g. Food, Transport" required minlength="1">
                             </div>
-                            <button type="submit" class="btn btn-primary" id="saveCategoryBtn">Create Category</button>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary" id="saveCategoryBtn">Create Category</button>
+                                <button type="button" class="btn btn-outline" id="cancelCategoryEditBtn" style="display:none;">Cancel</button>
+                            </div>
                         </form>
                     </div>
                 </div>
@@ -77,6 +82,7 @@
                                     <tr>
                                         <th>#</th>
                                         <th>Category Name</th>
+                                        <th>Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="categoriesBody"></tbody>

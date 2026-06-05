@@ -1,3 +1,4 @@
+DROP DATABASE expense_tracker;
 CREATE DATABASE IF NOT EXISTS expense_tracker;
 USE expense_tracker;
 
@@ -18,6 +19,10 @@ CREATE TABLE categories (
         REFERENCES users(id)
         ON DELETE CASCADE
 );
+
+ALTER TABLE categories
+ADD CONSTRAINT unique_user_category
+UNIQUE(user_id, category_name);
 
 CREATE TABLE expenses (
     id INT PRIMARY KEY AUTO_INCREMENT,
@@ -58,3 +63,8 @@ CREATE TABLE budgets (
         REFERENCES users(id)
         ON DELETE CASCADE
 );
+
+CREATE INDEX idx_expenses_user ON expenses(user_id);
+CREATE INDEX idx_income_user ON income(user_id);
+CREATE INDEX idx_categories_user ON categories(user_id);
+CREATE INDEX idx_budgets_user ON budgets(user_id);

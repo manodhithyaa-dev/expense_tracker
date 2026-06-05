@@ -3,8 +3,11 @@ from fastapi.middleware.cors import CORSMiddleware
 from mysql.connector import Error as MySQLError
 from database import get_connection
 from schemas import (
-    UserCreate, UserLogin, CategoryCreate,
-    ExpenseCreate, ExpenseUpdate, IncomeCreate, BudgetCreate,
+    UserCreate, UserLogin, UserUpdate, PasswordUpdate,
+    CategoryCreate, CategoryUpdate,
+    ExpenseCreate, ExpenseUpdate,
+    IncomeCreate, IncomeUpdate,
+    BudgetCreate, BudgetUpdate,
     DashboardResponse
 )
 from auth import hash_password, verify_password
@@ -14,17 +17,12 @@ app = FastAPI(title="Expense Tracker API", version="1.0.0")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000"
-    ],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-# ==========================================
-# Helper functions
-# ==========================================
 
 def _dict_cursor(conn):
     return conn.cursor(dictionary=True)
@@ -141,6 +139,98 @@ def get_user(user_id: int):
         conn.close()
 
 
+@app.put("/users/{user_id}")
+def update_user(user_id: int, updates: UserUpdate):
+    conn = get_connection()
+    cursor = _dict_cursor(conn)
+    try:
+        existing = _fetch_one(
+            cursor,
+            "SELECT id FROM users WHERE id=%s",
+            (user_id,)
+        )
+        if not existing:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        fields = []
+        values = []
+
+        if updates.name is not None:
+            fields.append("name=%s")
+            values.append(updates.name)
+
+        if updates.age is not None:
+            fields.append("age=%s")
+            values.append(updates.age)
+
+        if updates.email is not None:
+            dup = _fetch_one(
+                cursor,
+                "SELECT id FROM users WHERE email=%s AND id!=%s",
+                (updates.email, user_id)
+            )
+            if dup:
+                raise HTTPException(status_code=400, detail="Email already in use")
+            fields.append("email=%s")
+            values.append(updates.email)
+
+        if not fields:
+            raise HTTPException(status_code=400, detail="No fields to update")
+
+        values.append(user_id)
+        query = f"UPDATE users SET {', '.join(fields)} WHERE id=%s"
+        cursor.execute(query, values)
+        conn.commit()
+
+        updated = _fetch_one(
+            cursor,
+            "SELECT id, name, age, email, created_at FROM users WHERE id=%s",
+            (user_id,)
+        )
+        return {"message": "User updated", "user": updated}
+    except HTTPException:
+        raise
+    except MySQLError as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.put("/users/{user_id}/password")
+def change_password(user_id: int, pw: PasswordUpdate):
+    conn = get_connection()
+    cursor = _dict_cursor(conn)
+    try:
+        row = _fetch_one(
+            cursor,
+            "SELECT password FROM users WHERE id=%s",
+            (user_id,)
+        )
+        if not row:
+            raise HTTPException(status_code=404, detail="User not found")
+
+        if not verify_password(pw.current_password, row["password"]):
+            raise HTTPException(status_code=400, detail="Current password is incorrect")
+
+        hashed = hash_password(pw.new_password)
+        cursor.execute(
+            "UPDATE users SET password=%s WHERE id=%s",
+            (hashed, user_id)
+        )
+        conn.commit()
+        return {"message": "Password updated successfully"}
+    except HTTPException:
+        raise
+    except MySQLError as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
 # ==========================================
 # Authentication
 # ==========================================
@@ -190,6 +280,14 @@ def create_category(cat: CategoryCreate):
         if not _user_exists(cursor, cat.user_id):
             raise HTTPException(status_code=404, detail="User not found")
 
+        dup = _fetch_one(
+            cursor,
+            "SELECT id FROM categories WHERE user_id=%s AND category_name=%s",
+            (cat.user_id, cat.category_name)
+        )
+        if dup:
+            raise HTTPException(status_code=400, detail="Category name already exists for this user")
+
         cursor.execute(
             "INSERT INTO categories (user_id, category_name) VALUES (%s, %s)",
             (cat.user_id, cat.category_name)
@@ -237,6 +335,69 @@ def list_user_categories(user_id: int):
     except HTTPException:
         raise
     except MySQLError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.put("/categories/{category_id}")
+def update_category(category_id: int, cat: CategoryUpdate):
+    conn = get_connection()
+    cursor = _dict_cursor(conn)
+    try:
+        existing = _fetch_one(
+            cursor,
+            "SELECT id, user_id FROM categories WHERE id=%s",
+            (category_id,)
+        )
+        if not existing:
+            raise HTTPException(status_code=404, detail="Category not found")
+
+        dup = _fetch_one(
+            cursor,
+            "SELECT id FROM categories WHERE user_id=%s AND category_name=%s AND id!=%s",
+            (existing["user_id"], cat.category_name, category_id)
+        )
+        if dup:
+            raise HTTPException(status_code=400, detail="Category name already exists for this user")
+
+        cursor.execute(
+            "UPDATE categories SET category_name=%s WHERE id=%s",
+            (cat.category_name, category_id)
+        )
+        conn.commit()
+        return {"message": "Category updated", "category_id": category_id}
+    except HTTPException:
+        raise
+    except MySQLError as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.delete("/categories/{category_id}")
+def delete_category(category_id: int):
+    conn = get_connection()
+    cursor = _dict_cursor(conn)
+    try:
+        existing = _fetch_one(
+            cursor,
+            "SELECT id FROM categories WHERE id=%s",
+            (category_id,)
+        )
+        if not existing:
+            raise HTTPException(status_code=404, detail="Category not found")
+
+        cursor.execute("DELETE FROM categories WHERE id=%s", (category_id,))
+        conn.commit()
+        return {"message": "Category deleted"}
+    except HTTPException:
+        raise
+    except MySQLError as e:
+        conn.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
     finally:
         cursor.close()
@@ -488,6 +649,28 @@ def list_income():
         conn.close()
 
 
+@app.get("/income/{income_id}")
+def get_income(income_id: int):
+    conn = get_connection()
+    cursor = _dict_cursor(conn)
+    try:
+        row = _fetch_one(
+            cursor,
+            "SELECT id, user_id, source, amount, income_date, created_at FROM income WHERE id=%s",
+            (income_id,)
+        )
+        if not row:
+            raise HTTPException(status_code=404, detail="Income not found")
+        return row
+    except HTTPException:
+        raise
+    except MySQLError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
 @app.get("/users/{user_id}/income")
 def list_user_income(user_id: int):
     conn = get_connection()
@@ -507,6 +690,76 @@ def list_user_income(user_id: int):
     except HTTPException:
         raise
     except MySQLError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.put("/income/{income_id}")
+def update_income(income_id: int, inc: IncomeUpdate):
+    conn = get_connection()
+    cursor = _dict_cursor(conn)
+    try:
+        existing = _fetch_one(
+            cursor,
+            "SELECT id FROM income WHERE id=%s",
+            (income_id,)
+        )
+        if not existing:
+            raise HTTPException(status_code=404, detail="Income not found")
+
+        fields = []
+        values = []
+
+        if inc.source is not None:
+            fields.append("source=%s")
+            values.append(inc.source)
+        if inc.amount is not None:
+            fields.append("amount=%s")
+            values.append(inc.amount)
+        if inc.income_date is not None:
+            fields.append("income_date=%s")
+            values.append(inc.income_date)
+
+        if not fields:
+            raise HTTPException(status_code=400, detail="No fields to update")
+
+        values.append(income_id)
+        query = f"UPDATE income SET {', '.join(fields)} WHERE id=%s"
+        cursor.execute(query, values)
+        conn.commit()
+        return {"message": "Income updated", "income_id": income_id}
+    except HTTPException:
+        raise
+    except MySQLError as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.delete("/income/{income_id}")
+def delete_income(income_id: int):
+    conn = get_connection()
+    cursor = _dict_cursor(conn)
+    try:
+        existing = _fetch_one(
+            cursor,
+            "SELECT id FROM income WHERE id=%s",
+            (income_id,)
+        )
+        if not existing:
+            raise HTTPException(status_code=404, detail="Income not found")
+
+        cursor.execute("DELETE FROM income WHERE id=%s", (income_id,))
+        conn.commit()
+        return {"message": "Income deleted"}
+    except HTTPException:
+        raise
+    except MySQLError as e:
+        conn.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
     finally:
         cursor.close()
@@ -558,6 +811,28 @@ def list_budgets():
         conn.close()
 
 
+@app.get("/budgets/{budget_id}")
+def get_budget(budget_id: int):
+    conn = get_connection()
+    cursor = _dict_cursor(conn)
+    try:
+        row = _fetch_one(
+            cursor,
+            "SELECT id, user_id, month, year, budget_amount FROM budgets WHERE id=%s",
+            (budget_id,)
+        )
+        if not row:
+            raise HTTPException(status_code=404, detail="Budget not found")
+        return row
+    except HTTPException:
+        raise
+    except MySQLError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
 @app.get("/users/{user_id}/budgets")
 def list_user_budgets(user_id: int):
     conn = get_connection()
@@ -575,6 +850,76 @@ def list_user_budgets(user_id: int):
     except HTTPException:
         raise
     except MySQLError as e:
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.put("/budgets/{budget_id}")
+def update_budget(budget_id: int, bud: BudgetUpdate):
+    conn = get_connection()
+    cursor = _dict_cursor(conn)
+    try:
+        existing = _fetch_one(
+            cursor,
+            "SELECT id FROM budgets WHERE id=%s",
+            (budget_id,)
+        )
+        if not existing:
+            raise HTTPException(status_code=404, detail="Budget not found")
+
+        fields = []
+        values = []
+
+        if bud.month is not None:
+            fields.append("month=%s")
+            values.append(bud.month)
+        if bud.year is not None:
+            fields.append("year=%s")
+            values.append(bud.year)
+        if bud.budget_amount is not None:
+            fields.append("budget_amount=%s")
+            values.append(bud.budget_amount)
+
+        if not fields:
+            raise HTTPException(status_code=400, detail="No fields to update")
+
+        values.append(budget_id)
+        query = f"UPDATE budgets SET {', '.join(fields)} WHERE id=%s"
+        cursor.execute(query, values)
+        conn.commit()
+        return {"message": "Budget updated", "budget_id": budget_id}
+    except HTTPException:
+        raise
+    except MySQLError as e:
+        conn.rollback()
+        raise HTTPException(status_code=500, detail=f"Database error: {e}")
+    finally:
+        cursor.close()
+        conn.close()
+
+
+@app.delete("/budgets/{budget_id}")
+def delete_budget(budget_id: int):
+    conn = get_connection()
+    cursor = _dict_cursor(conn)
+    try:
+        existing = _fetch_one(
+            cursor,
+            "SELECT id FROM budgets WHERE id=%s",
+            (budget_id,)
+        )
+        if not existing:
+            raise HTTPException(status_code=404, detail="Budget not found")
+
+        cursor.execute("DELETE FROM budgets WHERE id=%s", (budget_id,))
+        conn.commit()
+        return {"message": "Budget deleted"}
+    except HTTPException:
+        raise
+    except MySQLError as e:
+        conn.rollback()
         raise HTTPException(status_code=500, detail=f"Database error: {e}")
     finally:
         cursor.close()

@@ -4,6 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     setupLogout();
     setupSidebar();
     setupIncomeForm();
+    setupCancelEdit();
     loadIncome();
 });
 
@@ -41,12 +42,57 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
+function setupCancelEdit() {
+    document.getElementById('cancelIncomeEditBtn').addEventListener('click', cancelIncomeEdit);
+}
+
+function cancelIncomeEdit() {
+    document.getElementById('editIncomeId').value = '';
+    document.getElementById('incomeForm').reset();
+    document.getElementById('incomeFormTitle').textContent = 'Add Income';
+    document.getElementById('saveIncomeBtn').textContent = 'Add Income';
+    document.getElementById('cancelIncomeEditBtn').style.display = 'none';
+}
+
+function editIncome(id, source, amount, income_date) {
+    document.getElementById('editIncomeId').value = id;
+    document.getElementById('incomeSource').value = source;
+    document.getElementById('incomeAmount').value = amount;
+    document.getElementById('incomeDate').value = income_date;
+    document.getElementById('incomeFormTitle').textContent = 'Edit Income';
+    document.getElementById('saveIncomeBtn').textContent = 'Update Income';
+    document.getElementById('cancelIncomeEditBtn').style.display = 'inline-flex';
+    document.getElementById('incomeSource').focus();
+    document.getElementById('errorAlert').className = 'alert alert-danger';
+    document.getElementById('successAlert').className = 'alert alert-success';
+}
+
+async function deleteIncome(id) {
+    if (!confirm('Are you sure you want to delete this income record?')) return;
+
+    const errorEl = document.getElementById('errorAlert');
+    const successEl = document.getElementById('successAlert');
+    errorEl.className = 'alert alert-danger';
+    successEl.className = 'alert alert-success';
+
+    try {
+        await del(`/income/${id}`);
+        successEl.textContent = 'Income deleted successfully!';
+        successEl.className = 'alert alert-success show';
+        loadIncome();
+    } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.className = 'alert alert-danger show';
+    }
+}
+
 function setupIncomeForm() {
     document.getElementById('incomeForm').addEventListener('submit', async (e) => {
         e.preventDefault();
         const user = getCurrentUser();
         if (!user) return;
 
+        const editId = document.getElementById('editIncomeId').value;
         const btn = document.getElementById('saveIncomeBtn');
         const errorEl = document.getElementById('errorAlert');
         const successEl = document.getElementById('successAlert');
@@ -77,26 +123,26 @@ function setupIncomeForm() {
         }
 
         btn.disabled = true;
-        btn.textContent = 'Adding...';
 
         try {
-            await post('/income', {
-                user_id: user.id,
-                source,
-                amount,
-                income_date
-            });
+            if (editId) {
+                await put(`/income/${editId}`, { source, amount, income_date });
+                successEl.textContent = 'Income updated successfully!';
+                cancelIncomeEdit();
+            } else {
+                await post('/income', { user_id: user.id, source, amount, income_date });
+                successEl.textContent = 'Income added successfully!';
+                document.getElementById('incomeForm').reset();
+            }
 
-            successEl.textContent = 'Income added successfully!';
             successEl.className = 'alert alert-success show';
-            document.getElementById('incomeForm').reset();
             loadIncome();
         } catch (err) {
             errorEl.textContent = err.message;
             errorEl.className = 'alert alert-danger show';
         } finally {
             btn.disabled = false;
-            btn.textContent = 'Add Income';
+            btn.textContent = editId ? 'Update Income' : 'Add Income';
         }
     });
 }
@@ -129,6 +175,12 @@ async function loadIncome() {
                 <td><strong>${escapeHtml(inc.source)}</strong></td>
                 <td>${formatCurrency(inc.amount)}</td>
                 <td>${formatDate(inc.income_date)}</td>
+                <td>
+                    <div class="actions">
+                        <button class="btn btn-warning btn-sm" onclick="editIncome(${inc.id}, '${escapeHtml(inc.source)}', ${inc.amount}, '${inc.income_date}')">Edit</button>
+                        <button class="btn btn-danger btn-sm" onclick="deleteIncome(${inc.id})">Delete</button>
+                    </div>
+                </td>
             </tr>
         `).join('');
     } catch (err) {

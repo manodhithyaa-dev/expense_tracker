@@ -118,6 +118,45 @@ curl -s -X POST "$BASE_URL/categories" \
 echo -e "\n\n"
 
 echo "================================="
+echo "TEST DUPLICATE CATEGORY"
+echo "================================="
+curl -s -X POST "$BASE_URL/categories" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "user_id": 1,
+    "category_name": "Food"
+  }'
+echo -e "\n\n"
+
+echo "================================="
+echo "UPDATE CATEGORY"
+echo "================================="
+curl -s -X PUT "$BASE_URL/categories/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "category_name": "Groceries"
+  }'
+echo -e "\n\n"
+
+echo "================================="
+echo "VERIFY CATEGORY UPDATE"
+echo "================================="
+curl -s "$BASE_URL/users/1/categories"
+echo -e "\n\n"
+
+echo "================================="
+echo "DELETE CATEGORY"
+echo "================================="
+curl -s -X DELETE "$BASE_URL/categories/2"
+echo -e "\n\n"
+
+echo "================================="
+echo "VERIFY CATEGORY DELETE"
+echo "================================="
+curl -s "$BASE_URL/users/1/categories"
+echo -e "\n\n"
+
+echo "================================="
 echo "LIST ALL CATEGORIES"
 echo "================================="
 curl -s "$BASE_URL/categories"
@@ -148,7 +187,7 @@ curl -s -X POST "$BASE_URL/expenses" \
   -H "Content-Type: application/json" \
   -d '{
     "user_id": 1,
-    "category_id": 2,
+    "category_id": 1,
     "title": "Bus pass",
     "amount": 150.00,
     "expense_date": "2026-06-03"
@@ -315,6 +354,42 @@ curl -s "$BASE_URL/users/1/income"
 echo -e "\n\n"
 
 echo "================================="
+echo "GET INCOME 1"
+echo "================================="
+curl -s "$BASE_URL/income/1"
+echo -e "\n\n"
+
+echo "================================="
+echo "UPDATE INCOME"
+echo "================================="
+curl -s -X PUT "$BASE_URL/income/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "source": "Salary",
+    "amount": 55000.00,
+    "income_date": "2026-06-01"
+  }'
+echo -e "\n\n"
+
+echo "================================="
+echo "VERIFY INCOME UPDATE"
+echo "================================="
+curl -s "$BASE_URL/income/1"
+echo -e "\n\n"
+
+echo "================================="
+echo "DELETE INCOME"
+echo "================================="
+curl -s -X DELETE "$BASE_URL/income/2"
+echo -e "\n\n"
+
+echo "================================="
+echo "VERIFY INCOME DELETE"
+echo "================================="
+curl -s "$BASE_URL/users/1/income"
+echo -e "\n\n"
+
+echo "================================="
 echo "CREATE BUDGET FOR USER 1"
 echo "================================="
 curl -s -X POST "$BASE_URL/budgets" \
@@ -350,6 +425,93 @@ echo "================================="
 echo "LIST USER 1 BUDGETS"
 echo "================================="
 curl -s "$BASE_URL/users/1/budgets"
+echo -e "\n\n"
+
+echo "================================="
+echo "GET BUDGET 1"
+echo "================================="
+curl -s "$BASE_URL/budgets/1"
+echo -e "\n\n"
+
+echo "================================="
+echo "UPDATE BUDGET"
+echo "================================="
+curl -s -X PUT "$BASE_URL/budgets/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "month": 6,
+    "year": 2026,
+    "budget_amount": 15000.00
+  }'
+echo -e "\n\n"
+
+echo "================================="
+echo "VERIFY BUDGET UPDATE"
+echo "================================="
+curl -s "$BASE_URL/budgets/1"
+echo -e "\n\n"
+
+echo "================================="
+echo "DELETE BUDGET"
+echo "================================="
+curl -s -X DELETE "$BASE_URL/budgets/2"
+echo -e "\n\n"
+
+echo "================================="
+echo "VERIFY BUDGET DELETE"
+echo "================================="
+curl -s "$BASE_URL/budgets"
+echo -e "\n\n"
+
+echo "================================="
+echo "UPDATE USER PROFILE"
+echo "================================="
+curl -s -X PUT "$BASE_URL/users/1" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Mano Updated",
+    "age": 22,
+    "email": "mano@example.com"
+  }'
+echo -e "\n\n"
+
+echo "================================="
+echo "VERIFY PROFILE UPDATE"
+echo "================================="
+curl -s "$BASE_URL/users/1"
+echo -e "\n\n"
+
+echo "================================="
+echo "CHANGE PASSWORD"
+echo "================================="
+curl -s -X PUT "$BASE_URL/users/1/password" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "current_password": "secure123",
+    "new_password": "newsecure456"
+  }'
+echo -e "\n\n"
+
+echo "================================="
+echo "LOGIN WITH NEW PASSWORD"
+echo "================================="
+curl -s -X POST "$BASE_URL/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "mano@example.com",
+    "password": "newsecure456"
+  }'
+echo -e "\n\n"
+
+echo "================================="
+echo "LOGIN WITH OLD PASSWORD (SHOULD FAIL)"
+echo "================================="
+curl -s -X POST "$BASE_URL/login" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "email": "mano@example.com",
+    "password": "secure123"
+  }'
 echo -e "\n\n"
 
 echo "================================="

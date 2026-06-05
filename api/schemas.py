@@ -23,8 +23,23 @@ class UserResponse(BaseModel):
     created_at: Optional[str]
 
 
+class UserUpdate(BaseModel):
+    name: Optional[str] = Field(None, min_length=2, max_length=50)
+    age: Optional[int] = Field(None, gt=0, lt=120)
+    email: Optional[EmailStr] = None
+
+
+class PasswordUpdate(BaseModel):
+    current_password: str
+    new_password: str = Field(..., min_length=6)
+
+
 class CategoryCreate(BaseModel):
     user_id: int
+    category_name: str = Field(..., min_length=1, max_length=50)
+
+
+class CategoryUpdate(BaseModel):
     category_name: str = Field(..., min_length=1, max_length=50)
 
 
@@ -70,6 +85,12 @@ class IncomeCreate(BaseModel):
     income_date: date
 
 
+class IncomeUpdate(BaseModel):
+    source: Optional[str] = Field(None, min_length=1, max_length=100)
+    amount: Optional[float] = Field(None, gt=0)
+    income_date: Optional[date] = None
+
+
 class IncomeResponse(BaseModel):
     id: int
     user_id: int
@@ -84,6 +105,12 @@ class BudgetCreate(BaseModel):
     month: int = Field(..., ge=1, le=12)
     year: int = Field(..., ge=2000, le=2100)
     budget_amount: float = Field(..., gt=0)
+
+
+class BudgetUpdate(BaseModel):
+    month: Optional[int] = Field(None, ge=1, le=12)
+    year: Optional[int] = Field(None, ge=2000, le=2100)
+    budget_amount: Optional[float] = Field(None, gt=0)
 
 
 class BudgetResponse(BaseModel):
