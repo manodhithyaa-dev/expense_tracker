@@ -809,6 +809,121 @@ table .actions {
     }
 }
 
+/* ==========================================
+   BADGE
+   ========================================== */
+
+.badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 18px;
+    height: 18px;
+    padding: 0 6px;
+    background: var(--danger);
+    color: #fff;
+    border-radius: 10px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    line-height: 1;
+    margin-left: auto;
+}
+
+/* ==========================================
+   PERIOD BAR
+   ========================================== */
+
+.period-bar {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 24px;
+    flex-wrap: wrap;
+    background: var(--card-bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 12px 20px;
+    box-shadow: var(--shadow);
+}
+
+.period-selector,
+.report-selector {
+    display: flex;
+    gap: 4px;
+    background: var(--bg);
+    padding: 4px;
+    border-radius: var(--radius);
+}
+
+.period-btn {
+    background: transparent;
+    border: none;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.period-btn:hover {
+    color: var(--text);
+    background: rgba(0,0,0,0.04);
+}
+
+.period-btn.active {
+    background: var(--primary);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(59,130,246,0.25);
+}
+
+.date-range {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* ==========================================
+   PAGINATION
+   ========================================== */
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    gap: 6px;
+    margin-top: 20px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+}
+
+/* ==========================================
+   CHART CONTAINERS
+   ========================================== */
+
+canvas {
+    max-width: 100%;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+
+@media (max-width: 768px) {
+    .period-bar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+
+    .date-range {
+        flex-wrap: wrap;
+    }
+
+    .report-selector {
+        flex-wrap: wrap;
+    }
+}
+
 @media (max-width: 480px) {
     .stat-grid {
         grid-template-columns: 1fr;

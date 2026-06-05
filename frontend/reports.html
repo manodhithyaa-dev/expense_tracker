@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Reports - Expense Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><h2><span>$</span> ExpenseTracker</h2></div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><span class="icon">&#9632;</span> Dashboard</a>
+            <a href="reports.html" class="active"><span class="icon">&#128202;</span> Reports</a>
+            <a href="expenses.html"><span class="icon">&#36;</span> Expenses</a>
+            <a href="income.html"><span class="icon">&#8593;</span> Income</a>
+            <a href="categories.html"><span class="icon">&#9776;</span> Categories</a>
+            <a href="budgets.html"><span class="icon">&#128176;</span> Budgets</a>
+            <a href="notifications.html"><span class="icon">&#128276;</span> Notifications</a>
+            <a href="settings.html"><span class="icon">&#9881;</span> Settings</a>
+            <a href="profile.html"><span class="icon">&#128100;</span> Profile</a>
+        </nav>
+        <div class="sidebar-footer"><a href="#" id="logoutBtn"><span class="icon">&#8592;</span> Logout</a></div>
+    </aside>
+    <div class="main-content">
+        <header class="navbar">
+            <div class="navbar-left"><button class="menu-toggle" id="menuToggle">&#9776;</button><h1 class="page-title">Reports</h1></div>
+            <div class="navbar-right"><div class="navbar-user"><div class="user-avatar" id="userAvatar">U</div><div class="user-info"><div class="user-name" id="userName">User</div><div class="user-email" id="userEmail">user@example.com</div></div></div></div>
+        </header>
+        <div class="page-content">
+            <div class="period-bar">
+                <div class="report-selector">
+                    <button class="btn btn-sm period-btn active" data-report="monthly">Monthly</button>
+                    <button class="btn btn-sm period-btn" data-report="yearly">Yearly</button>
+                    <button class="btn btn-sm period-btn" data-report="custom">Custom</button>
+                </div>
+                <div style="display:flex;align-items:center;gap:12px;">
+                    <input type="number" id="reportYear" class="form-control" style="width:100px;" placeholder="Year">
+                    <select id="reportMonth" class="form-control" style="width:140px;display:none;">
+                        <option value="1">January</option><option value="2">February</option><option value="3">March</option>
+                        <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+                        <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+                        <option value="10">October</option><option value="11">November</option><option value="12">December</option>
+                    </select>
+                    <button class="btn btn-primary btn-sm" id="generateReport">Generate</button>
+                </div>
+            </div>
+            <div id="loadingReport" class="loading" style="display:none;"><div class="spinner"></div>Loading...</div>
+            <div id="reportContent" style="display:none;">
+                <div class="stat-grid" id="reportStats"></div>
+                <div class="content-grid">
+                    <div class="card"><div class="card-header"><h3>Top Categories</h3></div><div class="card-body"><canvas id="reportCategoryChart" height="280"></canvas></div></div>
+                    <div class="card"><div class="card-header"><h3>Budget Utilization</h3></div><div class="card-body"><canvas id="reportBudgetChart" height="280"></canvas></div></div>
+                    <div class="card full-width"><div class="card-header"><h3>Largest Transactions</h3></div><div class="card-body"><div class="table-container"><table><thead><tr><th>Title</th><th>Category</th><th>Amount</th></tr></thead><tbody id="reportTransactionsBody"></tbody></table></div></div></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/reports.js"></script>
+</body>
+</html>

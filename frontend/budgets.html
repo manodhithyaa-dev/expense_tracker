@@ -8,81 +8,48 @@
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <h2><span>$</span> ExpenseTracker</h2>
-        </div>
+        <div class="sidebar-brand"><h2><span>$</span> ExpenseTracker</h2></div>
         <nav class="sidebar-nav">
             <a href="dashboard.html"><span class="icon">&#9632;</span> Dashboard</a>
-            <a href="categories.html"><span class="icon">&#9776;</span> Categories</a>
+            <a href="reports.html"><span class="icon">&#128202;</span> Reports</a>
             <a href="expenses.html"><span class="icon">&#36;</span> Expenses</a>
             <a href="income.html"><span class="icon">&#8593;</span> Income</a>
+            <a href="categories.html"><span class="icon">&#9776;</span> Categories</a>
             <a href="budgets.html" class="active"><span class="icon">&#128176;</span> Budgets</a>
-            <a href="profile.html"><span class="icon">&#9881;</span> Profile</a>
+            <a href="notifications.html"><span class="icon">&#128276;</span> Notifications</a>
+            <a href="settings.html"><span class="icon">&#9881;</span> Settings</a>
+            <a href="profile.html"><span class="icon">&#128100;</span> Profile</a>
         </nav>
-        <div class="sidebar-footer">
-            <a href="#" id="logoutBtn"><span class="icon">&#8592;</span> Logout</a>
-        </div>
+        <div class="sidebar-footer"><a href="#" id="logoutBtn"><span class="icon">&#8592;</span> Logout</a></div>
     </aside>
-
     <div class="main-content">
         <header class="navbar">
-            <div class="navbar-left">
-                <button class="menu-toggle" id="menuToggle">&#9776;</button>
-                <h1 class="page-title">Budgets</h1>
-            </div>
-            <div class="navbar-right">
-                <div class="navbar-user">
-                    <div class="user-avatar" id="userAvatar">U</div>
-                    <div class="user-info">
-                        <div class="user-name" id="userName">User</div>
-                        <div class="user-email" id="userEmail">user@example.com</div>
-                    </div>
-                </div>
-            </div>
+            <div class="navbar-left"><button class="menu-toggle" id="menuToggle">&#9776;</button><h1 class="page-title">Budgets</h1></div>
+            <div class="navbar-right"><div class="navbar-user"><div class="user-avatar" id="userAvatar">U</div><div class="user-info"><div class="user-name" id="userName">User</div><div class="user-email" id="userEmail">user@example.com</div></div></div></div>
         </header>
-
         <div class="page-content">
             <div id="errorAlert" class="alert alert-danger"></div>
             <div id="successAlert" class="alert alert-success"></div>
-
             <div class="content-grid">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 id="budgetFormTitle">Set Budget</h3>
-                    </div>
+                    <div class="card-header"><h3 id="budgetFormTitle">Set Budget</h3></div>
                     <div class="card-body">
                         <form id="budgetForm">
                             <input type="hidden" id="editBudgetId" value="">
                             <div class="form-row">
                                 <div class="form-group">
                                     <label for="budgetMonth">Month</label>
-                                    <select id="budgetMonth" class="form-control" required>
-                                        <option value="">Select month</option>
-                                        <option value="1">January</option>
-                                        <option value="2">February</option>
-                                        <option value="3">March</option>
-                                        <option value="4">April</option>
-                                        <option value="5">May</option>
-                                        <option value="6">June</option>
-                                        <option value="7">July</option>
-                                        <option value="8">August</option>
-                                        <option value="9">September</option>
-                                        <option value="10">October</option>
-                                        <option value="11">November</option>
-                                        <option value="12">December</option>
+                                    <select id="budgetMonth" class="form-control">
+                                        <option value="">Select</option><option value="1">January</option><option value="2">February</option><option value="3">March</option>
+                                        <option value="4">April</option><option value="5">May</option><option value="6">June</option>
+                                        <option value="7">July</option><option value="8">August</option><option value="9">September</option>
+                                        <option value="10">October</option><option value="11">November</option><option value="12">December</option>
                                     </select>
                                 </div>
-                                <div class="form-group">
-                                    <label for="budgetYear">Year</label>
-                                    <input type="number" id="budgetYear" class="form-control" placeholder="e.g. 2026" min="2000" max="2100" required>
-                                </div>
+                                <div class="form-group"><label for="budgetYear">Year</label><input type="number" id="budgetYear" class="form-control" min="2000" max="2100"></div>
                             </div>
-                            <div class="form-group">
-                                <label for="budgetAmount">Budget Amount</label>
-                                <input type="number" id="budgetAmount" class="form-control" placeholder="0.00" step="0.01" min="0.01" required>
-                            </div>
+                            <div class="form-group"><label for="budgetAmount">Budget Amount</label><input type="number" id="budgetAmount" class="form-control" step="0.01" min="0.01" required></div>
                             <div class="form-actions">
                                 <button type="submit" class="btn btn-primary" id="saveBudgetBtn">Set Budget</button>
                                 <button type="button" class="btn btn-outline" id="cancelBudgetEditBtn" style="display:none;">Cancel</button>
@@ -90,40 +57,17 @@
                         </form>
                     </div>
                 </div>
-
                 <div class="card">
-                    <div class="card-header">
-                        <h3>Your Budgets</h3>
-                    </div>
+                    <div class="card-header"><h3>Your Budgets</h3></div>
                     <div class="card-body">
-                        <div id="loadingBudgets" class="loading">
-                            <div class="spinner"></div>
-                            Loading...
-                        </div>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>Month</th>
-                                        <th>Year</th>
-                                        <th>Amount</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="budgetsBody"></tbody>
-                            </table>
-                        </div>
-                        <div id="budgetsEmpty" class="empty-state" style="display:none;">
-                            <div class="empty-icon">&#128466;</div>
-                            <h4>No budgets set</h4>
-                            <p>Set a monthly budget to track your spending limits.</p>
-                        </div>
+                        <div id="loadingBudgets" class="loading"><div class="spinner"></div>Loading...</div>
+                        <div class="table-container"><table><thead><tr><th>Month</th><th>Year</th><th>Amount</th><th>Actions</th></tr></thead><tbody id="budgetsBody"></tbody></table></div>
+                        <div id="budgetsEmpty" class="empty-state" style="display:none;"><div class="empty-icon">&#128466;</div><h4>No budgets set</h4></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/budgets.js"></script>

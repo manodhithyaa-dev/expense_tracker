@@ -1,6 +1,7 @@
 #!/bin/bash
 
 BASE_URL="http://127.0.0.1:8000"
+TOKEN=""
 
 echo "================================="
 echo "HEALTH CHECK"
@@ -9,123 +10,76 @@ curl -s "$BASE_URL/"
 echo -e "\n\n"
 
 echo "================================="
-echo "CREATE USER 1"
+echo "REGISTER USER 1"
 echo "================================="
-curl -s -X POST "$BASE_URL/users" \
+RESP=$(curl -s -X POST "$BASE_URL/auth/register" \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "Mano",
-    "age": 21,
-    "email": "mano@example.com",
-    "password": "secure123"
-  }'
+  -d '{"name":"Mano","age":21,"email":"mano@example.com","password":"secure123"}')
+echo "$RESP"
+TOKEN1=$(echo "$RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))" 2>/dev/null)
 echo -e "\n\n"
 
 echo "================================="
-echo "CREATE USER 2"
+echo "REGISTER USER 2"
 echo "================================="
-curl -s -X POST "$BASE_URL/users" \
+RESP2=$(curl -s -X POST "$BASE_URL/auth/register" \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "John",
-    "age": 25,
-    "email": "john@example.com",
-    "password": "secure456"
-  }'
+  -d '{"name":"John","age":25,"email":"john@example.com","password":"secure456"}')
+echo "$RESP2"
+TOKEN2=$(echo "$RESP2" | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))" 2>/dev/null)
 echo -e "\n\n"
 
 echo "================================="
 echo "TEST DUPLICATE EMAIL"
 echo "================================="
-curl -s -X POST "$BASE_URL/users" \
+curl -s -X POST "$BASE_URL/auth/register" \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "Duplicate",
-    "age": 30,
-    "email": "mano@example.com",
-    "password": "test123"
-  }'
-echo -e "\n\n"
-
-echo "================================="
-echo "LIST USERS"
-echo "================================="
-curl -s "$BASE_URL/users"
-echo -e "\n\n"
-
-echo "================================="
-echo "GET USER 1"
-echo "================================="
-curl -s "$BASE_URL/users/1"
-echo -e "\n\n"
-
-echo "================================="
-echo "GET INVALID USER"
-echo "================================="
-curl -s "$BASE_URL/users/999"
+  -d '{"name":"Dup","age":30,"email":"mano@example.com","password":"test123"}'
 echo -e "\n\n"
 
 echo "================================="
 echo "LOGIN USER 1"
 echo "================================="
-curl -s -X POST "$BASE_URL/login" \
+RESP=$(curl -s -X POST "$BASE_URL/auth/login" \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "mano@example.com",
-    "password": "secure123"
-  }'
+  -d '{"email":"mano@example.com","password":"secure123"}')
+echo "$RESP"
+TOKEN=$(echo "$RESP" | python3 -c "import sys,json; print(json.load(sys.stdin).get('access_token',''))" 2>/dev/null)
+echo -e "\n\n"
+
+echo "================================="
+echo "GET CURRENT USER"
+echo "================================="
+curl -s "$BASE_URL/auth/me" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
 echo "LOGIN INVALID PASSWORD"
 echo "================================="
-curl -s -X POST "$BASE_URL/login" \
+curl -s -X POST "$BASE_URL/auth/login" \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "mano@example.com",
-    "password": "wrongpassword"
-  }'
+  -d '{"email":"mano@example.com","password":"wrong"}'
 echo -e "\n\n"
 
 echo "================================="
-echo "CREATE CATEGORY FOR USER 1"
+echo "CREATE CATEGORY"
 echo "================================="
 curl -s -X POST "$BASE_URL/categories" \
   -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 1,
-    "category_name": "Food"
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"category_name":"Food"}'
 echo -e "\n\n"
 
 curl -s -X POST "$BASE_URL/categories" \
   -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 1,
-    "category_name": "Transport"
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"category_name":"Transport"}'
 echo -e "\n\n"
 
 echo "================================="
-echo "CREATE CATEGORY FOR USER 2"
+echo "LIST CATEGORIES"
 echo "================================="
-curl -s -X POST "$BASE_URL/categories" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 2,
-    "category_name": "Shopping"
-  }'
-echo -e "\n\n"
-
-echo "================================="
-echo "TEST DUPLICATE CATEGORY"
-echo "================================="
-curl -s -X POST "$BASE_URL/categories" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 1,
-    "category_name": "Food"
-  }'
+curl -s "$BASE_URL/categories" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
@@ -133,230 +87,86 @@ echo "UPDATE CATEGORY"
 echo "================================="
 curl -s -X PUT "$BASE_URL/categories/1" \
   -H "Content-Type: application/json" \
-  -d '{
-    "category_name": "Groceries"
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"category_name":"Groceries"}'
 echo -e "\n\n"
 
 echo "================================="
-echo "VERIFY CATEGORY UPDATE"
+echo "DUPLICATE CATEGORY"
 echo "================================="
-curl -s "$BASE_URL/users/1/categories"
+curl -s -X POST "$BASE_URL/categories" \
+  -H "Content-Type: application/json" \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"category_name":"Groceries"}'
 echo -e "\n\n"
 
 echo "================================="
-echo "DELETE CATEGORY"
-echo "================================="
-curl -s -X DELETE "$BASE_URL/categories/2"
-echo -e "\n\n"
-
-echo "================================="
-echo "VERIFY CATEGORY DELETE"
-echo "================================="
-curl -s "$BASE_URL/users/1/categories"
-echo -e "\n\n"
-
-echo "================================="
-echo "LIST ALL CATEGORIES"
-echo "================================="
-curl -s "$BASE_URL/categories"
-echo -e "\n\n"
-
-echo "================================="
-echo "LIST USER 1 CATEGORIES"
-echo "================================="
-curl -s "$BASE_URL/users/1/categories"
-echo -e "\n\n"
-
-echo "================================="
-echo "CREATE EXPENSE FOR USER 1 (Food)"
+echo "CREATE EXPENSE"
 echo "================================="
 curl -s -X POST "$BASE_URL/expenses" \
   -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 1,
-    "category_id": 1,
-    "title": "Pizza dinner",
-    "amount": 450.00,
-    "expense_date": "2026-06-05",
-    "notes": "Dinner with friends"
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"category_id":1,"title":"Pizza dinner","amount":450,"expense_date":"2026-06-05","payment_method":"card","merchant_name":"Pizza Hut"}'
 echo -e "\n\n"
 
 curl -s -X POST "$BASE_URL/expenses" \
   -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 1,
-    "category_id": 1,
-    "title": "Bus pass",
-    "amount": 150.00,
-    "expense_date": "2026-06-03"
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"category_id":1,"title":"Bus pass","amount":150,"expense_date":"2026-06-03","payment_method":"upi"}'
 echo -e "\n\n"
 
 echo "================================="
-echo "CREATE EXPENSE FOR USER 2 (Shopping)"
+echo "LIST EXPENSES"
 echo "================================="
-curl -s -X POST "$BASE_URL/expenses" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 2,
-    "category_id": 3,
-    "title": "New shoes",
-    "amount": 2500.00,
-    "expense_date": "2026-06-04",
-    "notes": "Sports shoes"
-  }'
+curl -s "$BASE_URL/expenses?page=1&limit=10" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
-echo "TEST INVALID CATEGORY"
+echo "SEARCH EXPENSES"
 echo "================================="
-curl -s -X POST "$BASE_URL/expenses" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 1,
-    "category_id": 999,
-    "title": "Test",
-    "amount": 100.00,
-    "expense_date": "2026-06-05"
-  }'
+curl -s "$BASE_URL/expenses?search=Pizza" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
-echo "TEST CATEGORY NOT BELONGING TO USER"
-echo "================================="
-curl -s -X POST "$BASE_URL/expenses" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 1,
-    "category_id": 3,
-    "title": "Test wrong category",
-    "amount": 100.00,
-    "expense_date": "2026-06-05"
-  }'
-echo -e "\n\n"
-
-echo "================================="
-echo "TEST INVALID USER EXPENSE"
-echo "================================="
-curl -s -X POST "$BASE_URL/expenses" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 999,
-    "category_id": 1,
-    "title": "Test",
-    "amount": 100.00,
-    "expense_date": "2026-06-05"
-  }'
-echo -e "\n\n"
-
-echo "================================="
-echo "LIST ALL EXPENSES"
-echo "================================="
-curl -s "$BASE_URL/expenses"
-echo -e "\n\n"
-
-echo "================================="
-echo "GET EXPENSE 1"
-echo "================================="
-curl -s "$BASE_URL/expenses/1"
-echo -e "\n\n"
-
-echo "================================="
-echo "LIST USER 1 EXPENSES"
-echo "================================="
-curl -s "$BASE_URL/users/1/expenses"
-echo -e "\n\n"
-
-echo "================================="
-echo "LIST USER 2 EXPENSES"
-echo "================================="
-curl -s "$BASE_URL/users/2/expenses"
-echo -e "\n\n"
-
-echo "================================="
-echo "UPDATE EXPENSE 1"
+echo "UPDATE EXPENSE"
 echo "================================="
 curl -s -X PUT "$BASE_URL/expenses/1" \
   -H "Content-Type: application/json" \
-  -d '{
-    "title": "Pizza and pasta",
-    "amount": 550.00,
-    "notes": "Dinner with family"
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"title":"Pizza and pasta","amount":550,"notes":"Dinner with family"}'
 echo -e "\n\n"
 
 echo "================================="
-echo "VERIFY EXPENSE UPDATE"
+echo "DELETE EXPENSE"
 echo "================================="
-curl -s "$BASE_URL/expenses/1"
+curl -s -X DELETE "$BASE_URL/expenses/2" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
-echo "DELETE EXPENSE 2"
+echo "LIST EXPENSES AFTER DELETE"
 echo "================================="
-curl -s -X DELETE "$BASE_URL/expenses/2"
+curl -s "$BASE_URL/expenses" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
-echo "VERIFY DELETE"
-echo "================================="
-curl -s "$BASE_URL/expenses"
-echo -e "\n\n"
-
-echo "================================="
-echo "CREATE INCOME FOR USER 1"
+echo "CREATE INCOME"
 echo "================================="
 curl -s -X POST "$BASE_URL/income" \
   -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 1,
-    "source": "Salary",
-    "amount": 50000.00,
-    "income_date": "2026-06-01"
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"source":"Salary","amount":50000,"income_date":"2026-06-01","income_type":"salary"}'
 echo -e "\n\n"
 
 curl -s -X POST "$BASE_URL/income" \
   -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 1,
-    "source": "Freelance",
-    "amount": 5000.00,
-    "income_date": "2026-06-10"
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"source":"Freelance","amount":5000,"income_date":"2026-06-10","income_type":"freelance"}'
 echo -e "\n\n"
 
 echo "================================="
-echo "CREATE INCOME FOR USER 2"
+echo "LIST INCOME"
 echo "================================="
-curl -s -X POST "$BASE_URL/income" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 2,
-    "source": "Salary",
-    "amount": 30000.00,
-    "income_date": "2026-06-01"
-  }'
-echo -e "\n\n"
-
-echo "================================="
-echo "LIST ALL INCOME"
-echo "================================="
-curl -s "$BASE_URL/income"
-echo -e "\n\n"
-
-echo "================================="
-echo "LIST USER 1 INCOME"
-echo "================================="
-curl -s "$BASE_URL/users/1/income"
-echo -e "\n\n"
-
-echo "================================="
-echo "GET INCOME 1"
-echo "================================="
-curl -s "$BASE_URL/income/1"
+curl -s "$BASE_URL/income" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
@@ -364,166 +174,121 @@ echo "UPDATE INCOME"
 echo "================================="
 curl -s -X PUT "$BASE_URL/income/1" \
   -H "Content-Type: application/json" \
-  -d '{
-    "source": "Salary",
-    "amount": 55000.00,
-    "income_date": "2026-06-01"
-  }'
-echo -e "\n\n"
-
-echo "================================="
-echo "VERIFY INCOME UPDATE"
-echo "================================="
-curl -s "$BASE_URL/income/1"
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"source":"Salary","amount":55000,"income_date":"2026-06-01"}'
 echo -e "\n\n"
 
 echo "================================="
 echo "DELETE INCOME"
 echo "================================="
-curl -s -X DELETE "$BASE_URL/income/2"
+curl -s -X DELETE "$BASE_URL/income/2" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
-echo "VERIFY INCOME DELETE"
-echo "================================="
-curl -s "$BASE_URL/users/1/income"
-echo -e "\n\n"
-
-echo "================================="
-echo "CREATE BUDGET FOR USER 1"
+echo "CREATE BUDGET"
 echo "================================="
 curl -s -X POST "$BASE_URL/budgets" \
   -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 1,
-    "month": 6,
-    "year": 2026,
-    "budget_amount": 10000.00
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"month":6,"year":2026,"budget_amount":10000}'
 echo -e "\n\n"
 
 echo "================================="
-echo "CREATE BUDGET FOR USER 2"
+echo "UPDATE BUDGET (UPSERT SAME MONTH/YEAR)"
 echo "================================="
 curl -s -X POST "$BASE_URL/budgets" \
   -H "Content-Type: application/json" \
-  -d '{
-    "user_id": 2,
-    "month": 6,
-    "year": 2026,
-    "budget_amount": 8000.00
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"month":6,"year":2026,"budget_amount":15000}'
 echo -e "\n\n"
 
 echo "================================="
-echo "LIST ALL BUDGETS"
+echo "LIST BUDGETS"
 echo "================================="
-curl -s "$BASE_URL/budgets"
-echo -e "\n\n"
-
-echo "================================="
-echo "LIST USER 1 BUDGETS"
-echo "================================="
-curl -s "$BASE_URL/users/1/budgets"
-echo -e "\n\n"
-
-echo "================================="
-echo "GET BUDGET 1"
-echo "================================="
-curl -s "$BASE_URL/budgets/1"
-echo -e "\n\n"
-
-echo "================================="
-echo "UPDATE BUDGET"
-echo "================================="
-curl -s -X PUT "$BASE_URL/budgets/1" \
-  -H "Content-Type: application/json" \
-  -d '{
-    "month": 6,
-    "year": 2026,
-    "budget_amount": 15000.00
-  }'
-echo -e "\n\n"
-
-echo "================================="
-echo "VERIFY BUDGET UPDATE"
-echo "================================="
-curl -s "$BASE_URL/budgets/1"
+curl -s "$BASE_URL/budgets" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
 echo "DELETE BUDGET"
 echo "================================="
-curl -s -X DELETE "$BASE_URL/budgets/2"
+curl -s -X DELETE "$BASE_URL/budgets/1" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
-echo "VERIFY BUDGET DELETE"
+echo "DASHBOARD (CURRENT MONTH)"
 echo "================================="
-curl -s "$BASE_URL/budgets"
+curl -s "$BASE_URL/dashboard" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
-echo "UPDATE USER PROFILE"
+echo "MONTHLY REPORT"
 echo "================================="
-curl -s -X PUT "$BASE_URL/users/1" \
+curl -s "$BASE_URL/reports/monthly?year=2026&month=6" -H "Authorization: Bearer $TOKEN"
+echo -e "\n\n"
+
+echo "================================="
+echo "UPDATE PROFILE"
+echo "================================="
+curl -s -X PUT "$BASE_URL/users/profile" \
   -H "Content-Type: application/json" \
-  -d '{
-    "name": "Mano Updated",
-    "age": 22,
-    "email": "mano@example.com"
-  }'
-echo -e "\n\n"
-
-echo "================================="
-echo "VERIFY PROFILE UPDATE"
-echo "================================="
-curl -s "$BASE_URL/users/1"
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"name":"Mano Updated","age":22}'
 echo -e "\n\n"
 
 echo "================================="
 echo "CHANGE PASSWORD"
 echo "================================="
-curl -s -X PUT "$BASE_URL/users/1/password" \
+curl -s -X PUT "$BASE_URL/users/password" \
   -H "Content-Type: application/json" \
-  -d '{
-    "current_password": "secure123",
-    "new_password": "newsecure456"
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"current_password":"secure123","new_password":"newsecure456"}'
 echo -e "\n\n"
 
 echo "================================="
 echo "LOGIN WITH NEW PASSWORD"
 echo "================================="
-curl -s -X POST "$BASE_URL/login" \
+curl -s -X POST "$BASE_URL/auth/login" \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "mano@example.com",
-    "password": "newsecure456"
-  }'
+  -d '{"email":"mano@example.com","password":"newsecure456"}'
 echo -e "\n\n"
 
 echo "================================="
-echo "LOGIN WITH OLD PASSWORD (SHOULD FAIL)"
+echo "SETTINGS - UPDATE"
 echo "================================="
-curl -s -X POST "$BASE_URL/login" \
+curl -s -X PUT "$BASE_URL/settings" \
   -H "Content-Type: application/json" \
-  -d '{
-    "email": "mano@example.com",
-    "password": "secure123"
-  }'
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"currency":"INR","budget_warning_percent":85}'
 echo -e "\n\n"
 
 echo "================================="
-echo "DASHBOARD USER 1"
+echo "SETTINGS - GET"
 echo "================================="
-curl -s "$BASE_URL/dashboard/1"
+curl -s "$BASE_URL/settings" -H "Authorization: Bearer $TOKEN"
 echo -e "\n\n"
 
 echo "================================="
-echo "DASHBOARD USER 2"
+echo "GLOBAL SEARCH"
 echo "================================="
-curl -s "$BASE_URL/dashboard/2"
+curl -s "$BASE_URL/search?q=Pizza" -H "Authorization: Bearer $TOKEN"
+echo -e "\n\n"
+
+echo "================================="
+echo "NOTIFICATIONS"
+echo "================================="
+curl -s "$BASE_URL/notifications" -H "Authorization: Bearer $TOKEN"
+echo -e "\n\n"
+
+echo "================================="
+echo "EXPORT BACKUP"
+echo "================================="
+curl -s "$BASE_URL/export/backup" -H "Authorization: Bearer $TOKEN" | python3 -c "import sys,json; d=json.load(sys.stdin); print(f'Expenses: {len(d.get(\"expenses\",[]))}, Income: {len(d.get(\"income\",[]))}')" 2>/dev/null
+echo -e "\n\n"
+
+echo "================================="
+echo "UNAUTHORIZED ACCESS (SHOULD FAIL)"
+echo "================================="
+curl -s "$BASE_URL/dashboard"
 echo -e "\n\n"
 
 echo "================================="

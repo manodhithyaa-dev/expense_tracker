@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Expense Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand"><h2><span>$</span> ExpenseTracker</h2></div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><span class="icon">&#9632;</span> Dashboard</a>
+            <a href="reports.html"><span class="icon">&#128202;</span> Reports</a>
+            <a href="expenses.html"><span class="icon">&#36;</span> Expenses</a>
+            <a href="income.html"><span class="icon">&#8593;</span> Income</a>
+            <a href="categories.html"><span class="icon">&#9776;</span> Categories</a>
+            <a href="budgets.html"><span class="icon">&#128176;</span> Budgets</a>
+            <a href="notifications.html" class="active"><span class="icon">&#128276;</span> Notifications</a>
+            <a href="settings.html"><span class="icon">&#9881;</span> Settings</a>
+            <a href="profile.html"><span class="icon">&#128100;</span> Profile</a>
+        </nav>
+        <div class="sidebar-footer"><a href="#" id="logoutBtn"><span class="icon">&#8592;</span> Logout</a></div>
+    </aside>
+    <div class="main-content">
+        <header class="navbar">
+            <div class="navbar-left"><button class="menu-toggle" id="menuToggle">&#9776;</button><h1 class="page-title">Notifications</h1></div>
+            <div class="navbar-right">
+                <button class="btn btn-outline btn-sm" id="markAllRead">Mark All Read</button>
+                <div class="navbar-user"><div class="user-avatar" id="userAvatar">U</div><div class="user-info"><div class="user-name" id="userName">User</div><div class="user-email" id="userEmail">user@example.com</div></div></div>
+            </div>
+        </header>
+        <div class="page-content">
+            <div id="loadingNotif" class="loading"><div class="spinner"></div>Loading...</div>
+            <div id="notifList"></div>
+            <div id="notifEmpty" class="empty-state" style="display:none;"><div class="empty-icon">&#128276;</div><h4>No notifications</h4><p>You're all caught up!</p></div>
+        </div>
+    </div>
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/notifications.js"></script>
+</body>
+</html>

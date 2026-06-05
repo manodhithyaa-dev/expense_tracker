@@ -13,13 +13,9 @@
                 <h1><span>$</span> ExpenseTracker</h1>
                 <p>Create your account</p>
             </div>
-            <div class="auth-title">
-                <h2>Get Started</h2>
-            </div>
-
+            <div class="auth-title"><h2>Get Started</h2></div>
             <div id="errorAlert" class="alert alert-danger"></div>
             <div id="successAlert" class="alert alert-success"></div>
-
             <form id="registerForm">
                 <div class="form-row">
                     <div class="form-group">
@@ -28,7 +24,7 @@
                     </div>
                     <div class="form-group">
                         <label for="age">Age</label>
-                        <input type="number" id="age" class="form-control" placeholder="Your age" min="1" max="119">
+                        <input type="number" id="age" class="form-control" placeholder="Age" min="1" max="119">
                     </div>
                 </div>
                 <div class="form-group">
@@ -39,17 +35,11 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" class="form-control" placeholder="At least 6 characters" required minlength="6">
                 </div>
-                <button type="submit" class="btn btn-primary btn-block" id="registerBtn">
-                    Create Account
-                </button>
+                <button type="submit" class="btn btn-primary btn-block" id="registerBtn">Create Account</button>
             </form>
-
-            <div class="auth-link">
-                Already have an account? <a href="login.html">Sign In</a>
-            </div>
+            <div class="auth-link">Already have an account? <a href="login.html">Sign In</a></div>
         </div>
     </div>
-
     <script src="js/api.js"></script>
     <script>
         document.getElementById('registerForm').addEventListener('submit', async (e) => {
@@ -57,7 +47,6 @@
             const btn = document.getElementById('registerBtn');
             const errorEl = document.getElementById('errorAlert');
             const successEl = document.getElementById('successAlert');
-
             const name = document.getElementById('name').value.trim();
             const age = document.getElementById('age').value.trim();
             const email = document.getElementById('email').value.trim();
@@ -66,39 +55,27 @@
             errorEl.className = 'alert alert-danger';
             successEl.className = 'alert alert-success';
 
-            if (!name || !email || !password) {
-                errorEl.textContent = 'Please fill in all required fields.';
-                errorEl.className = 'alert alert-danger show';
-                return;
-            }
-
-            if (name.length < 2) {
-                errorEl.textContent = 'Name must be at least 2 characters.';
-                errorEl.className = 'alert alert-danger show';
-                return;
-            }
-
-            if (password.length < 6) {
-                errorEl.textContent = 'Password must be at least 6 characters.';
-                errorEl.className = 'alert alert-danger show';
-                return;
-            }
+            if (!name || name.length < 2) { errorEl.textContent = 'Name must be at least 2 characters.'; errorEl.className = 'alert alert-danger show'; return; }
+            if (!email) { errorEl.textContent = 'Email is required.'; errorEl.className = 'alert alert-danger show'; return; }
+            if (password.length < 6) { errorEl.textContent = 'Password must be at least 6 characters.'; errorEl.className = 'alert alert-danger show'; return; }
 
             btn.disabled = true;
             btn.textContent = 'Creating account...';
 
             try {
-                const payload = { name, email, password };
-                if (age) payload.age = parseInt(age);
+                const res = await fetch('http://localhost:8000/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ name, age: age ? parseInt(age) : null, email, password }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Registration failed');
 
-                await post('/users', payload);
-                successEl.textContent = 'Account created! Redirecting to login...';
+                storeTokens(data.access_token, data.refresh_token);
+                localStorage.setItem('user', JSON.stringify(data.user));
+                successEl.textContent = 'Account created! Redirecting...';
                 successEl.className = 'alert alert-success show';
-                document.getElementById('registerForm').reset();
-
-                setTimeout(() => {
-                    window.location.href = 'login.html';
-                }, 1500);
+                setTimeout(() => { window.location.href = 'dashboard.html'; }, 1000);
             } catch (err) {
                 errorEl.textContent = err.message;
                 errorEl.className = 'alert alert-danger show';

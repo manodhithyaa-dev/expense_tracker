@@ -8,9 +8,12 @@ function getCurrentUser() {
     }
 }
 
+function isAuthenticated() {
+    return !!localStorage.getItem('access_token') && !!getCurrentUser();
+}
+
 function protectPage() {
-    const user = getCurrentUser();
-    if (!user) {
+    if (!isAuthenticated()) {
         window.location.href = 'login.html';
     }
 }
@@ -39,6 +42,41 @@ function setupLogout() {
 }
 
 function logout() {
-    localStorage.removeItem('user');
+    clearTokens();
     window.location.href = 'login.html';
+}
+
+function setupSidebar() {
+    const toggle = document.getElementById('menuToggle');
+    const sidebar = document.getElementById('sidebar');
+    const overlay = document.getElementById('sidebarOverlay');
+
+    if (toggle) {
+        toggle.addEventListener('click', () => {
+            sidebar.classList.toggle('open');
+            overlay.classList.toggle('show');
+        });
+    }
+
+    if (overlay) {
+        overlay.addEventListener('click', () => {
+            sidebar.classList.remove('open');
+            overlay.classList.remove('show');
+        });
+    }
+}
+
+async function loadNotificationsBadge() {
+    try {
+        const result = await get('/notifications');
+        const badge = document.getElementById('notifBadge');
+        if (badge && result.unread > 0) {
+            badge.textContent = result.unread;
+            badge.style.display = 'inline';
+        } else if (badge) {
+            badge.style.display = 'none';
+        }
+    } catch {
+        // silent
+    }
 }

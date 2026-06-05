@@ -13,12 +13,8 @@
                 <h1><span>$</span> ExpenseTracker</h1>
                 <p>Track your finances with ease</p>
             </div>
-            <div class="auth-title">
-                <h2>Welcome Back</h2>
-            </div>
-
+            <div class="auth-title"><h2>Welcome Back</h2></div>
             <div id="errorAlert" class="alert alert-danger"></div>
-
             <form id="loginForm">
                 <div class="form-group">
                     <label for="email">Email</label>
@@ -28,24 +24,17 @@
                     <label for="password">Password</label>
                     <input type="password" id="password" class="form-control" placeholder="Enter your password" required>
                 </div>
-                <button type="submit" class="btn btn-primary btn-block" id="loginBtn">
-                    Sign In
-                </button>
+                <button type="submit" class="btn btn-primary btn-block" id="loginBtn">Sign In</button>
             </form>
-
-            <div class="auth-link">
-                Don't have an account? <a href="register.html">Register</a>
-            </div>
+            <div class="auth-link">Don't have an account? <a href="register.html">Register</a></div>
         </div>
     </div>
-
     <script src="js/api.js"></script>
     <script>
         document.getElementById('loginForm').addEventListener('submit', async (e) => {
             e.preventDefault();
             const btn = document.getElementById('loginBtn');
             const alertEl = document.getElementById('errorAlert');
-
             const email = document.getElementById('email').value.trim();
             const password = document.getElementById('password').value;
 
@@ -60,8 +49,16 @@
             alertEl.className = 'alert alert-danger';
 
             try {
-                const result = await post('/login', { email, password });
-                localStorage.setItem('user', JSON.stringify(result.user));
+                const res = await fetch('http://localhost:8000/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email, password }),
+                });
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.detail || 'Login failed');
+
+                storeTokens(data.access_token, data.refresh_token);
+                localStorage.setItem('user', JSON.stringify(data.user));
                 window.location.href = 'dashboard.html';
             } catch (err) {
                 alertEl.textContent = err.message;

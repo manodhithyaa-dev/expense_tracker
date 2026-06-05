@@ -8,89 +8,50 @@
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <h2><span>$</span> ExpenseTracker</h2>
-        </div>
+        <div class="sidebar-brand"><h2><span>$</span> ExpenseTracker</h2></div>
         <nav class="sidebar-nav">
             <a href="dashboard.html"><span class="icon">&#9632;</span> Dashboard</a>
-            <a href="categories.html"><span class="icon">&#9776;</span> Categories</a>
+            <a href="reports.html"><span class="icon">&#128202;</span> Reports</a>
             <a href="expenses.html"><span class="icon">&#36;</span> Expenses</a>
             <a href="income.html"><span class="icon">&#8593;</span> Income</a>
+            <a href="categories.html"><span class="icon">&#9776;</span> Categories</a>
             <a href="budgets.html"><span class="icon">&#128176;</span> Budgets</a>
-            <a href="profile.html" class="active"><span class="icon">&#9881;</span> Profile</a>
+            <a href="notifications.html"><span class="icon">&#128276;</span> Notifications</a>
+            <a href="settings.html"><span class="icon">&#9881;</span> Settings</a>
+            <a href="profile.html" class="active"><span class="icon">&#128100;</span> Profile</a>
         </nav>
-        <div class="sidebar-footer">
-            <a href="#" id="logoutBtn"><span class="icon">&#8592;</span> Logout</a>
-        </div>
+        <div class="sidebar-footer"><a href="#" id="logoutBtn"><span class="icon">&#8592;</span> Logout</a></div>
     </aside>
-
     <div class="main-content">
         <header class="navbar">
-            <div class="navbar-left">
-                <button class="menu-toggle" id="menuToggle">&#9776;</button>
-                <h1 class="page-title">Profile</h1>
-            </div>
-            <div class="navbar-right">
-                <div class="navbar-user">
-                    <div class="user-avatar" id="userAvatar">U</div>
-                    <div class="user-info">
-                        <div class="user-name" id="userName">User</div>
-                        <div class="user-email" id="userEmail">user@example.com</div>
-                    </div>
-                </div>
-            </div>
+            <div class="navbar-left"><button class="menu-toggle" id="menuToggle">&#9776;</button><h1 class="page-title">Profile</h1></div>
+            <div class="navbar-right"><div class="navbar-user"><div class="user-avatar" id="userAvatar">U</div><div class="user-info"><div class="user-name" id="userName">User</div><div class="user-email" id="userEmail">user@example.com</div></div></div></div>
         </header>
-
         <div class="page-content">
             <div id="errorAlert" class="alert alert-danger"></div>
             <div id="successAlert" class="alert alert-success"></div>
-
             <div class="content-grid">
                 <div class="card">
-                    <div class="card-header">
-                        <h3>Edit Profile</h3>
-                    </div>
+                    <div class="card-header"><h3>Edit Profile</h3></div>
                     <div class="card-body">
                         <form id="profileForm">
                             <div class="form-row">
-                                <div class="form-group">
-                                    <label for="profileName">Name</label>
-                                    <input type="text" id="profileName" class="form-control" required minlength="2">
-                                </div>
-                                <div class="form-group">
-                                    <label for="profileAge">Age</label>
-                                    <input type="number" id="profileAge" class="form-control" min="1" max="119">
-                                </div>
+                                <div class="form-group"><label for="profileName">Name</label><input type="text" id="profileName" class="form-control" required minlength="2"></div>
+                                <div class="form-group"><label for="profileAge">Age</label><input type="number" id="profileAge" class="form-control" min="1" max="119"></div>
                             </div>
-                            <div class="form-group">
-                                <label for="profileEmail">Email</label>
-                                <input type="email" id="profileEmail" class="form-control" required>
-                            </div>
+                            <div class="form-group"><label for="profileEmail">Email</label><input type="email" id="profileEmail" class="form-control" required></div>
                             <button type="submit" class="btn btn-primary" id="saveProfileBtn">Save Changes</button>
                         </form>
                     </div>
                 </div>
-
                 <div class="card">
-                    <div class="card-header">
-                        <h3>Change Password</h3>
-                    </div>
+                    <div class="card-header"><h3>Change Password</h3></div>
                     <div class="card-body">
                         <form id="passwordForm">
-                            <div class="form-group">
-                                <label for="currentPassword">Current Password</label>
-                                <input type="password" id="currentPassword" class="form-control" placeholder="Enter current password" required>
-                            </div>
-                            <div class="form-group">
-                                <label for="newPassword">New Password</label>
-                                <input type="password" id="newPassword" class="form-control" placeholder="At least 6 characters" required minlength="6">
-                            </div>
-                            <div class="form-group">
-                                <label for="confirmPassword">Confirm New Password</label>
-                                <input type="password" id="confirmPassword" class="form-control" placeholder="Repeat new password" required minlength="6">
-                            </div>
+                            <div class="form-group"><label for="currentPassword">Current Password</label><input type="password" id="currentPassword" class="form-control" required></div>
+                            <div class="form-group"><label for="newPassword">New Password</label><input type="password" id="newPassword" class="form-control" minlength="6" required></div>
+                            <div class="form-group"><label for="confirmPassword">Confirm New Password</label><input type="password" id="confirmPassword" class="form-control" minlength="6" required></div>
                             <button type="submit" class="btn btn-primary" id="savePasswordBtn">Change Password</button>
                         </form>
                     </div>
@@ -98,7 +59,6 @@
             </div>
         </div>
     </div>
-
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/profile.js"></script>

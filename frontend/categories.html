@@ -8,97 +8,54 @@
 </head>
 <body>
     <div class="sidebar-overlay" id="sidebarOverlay"></div>
-
     <aside class="sidebar" id="sidebar">
-        <div class="sidebar-brand">
-            <h2><span>$</span> ExpenseTracker</h2>
-        </div>
+        <div class="sidebar-brand"><h2><span>$</span> ExpenseTracker</h2></div>
         <nav class="sidebar-nav">
             <a href="dashboard.html"><span class="icon">&#9632;</span> Dashboard</a>
-            <a href="categories.html" class="active"><span class="icon">&#9776;</span> Categories</a>
+            <a href="reports.html"><span class="icon">&#128202;</span> Reports</a>
             <a href="expenses.html"><span class="icon">&#36;</span> Expenses</a>
             <a href="income.html"><span class="icon">&#8593;</span> Income</a>
+            <a href="categories.html" class="active"><span class="icon">&#9776;</span> Categories</a>
             <a href="budgets.html"><span class="icon">&#128176;</span> Budgets</a>
-            <a href="profile.html"><span class="icon">&#9881;</span> Profile</a>
+            <a href="notifications.html"><span class="icon">&#128276;</span> Notifications</a>
+            <a href="settings.html"><span class="icon">&#9881;</span> Settings</a>
+            <a href="profile.html"><span class="icon">&#128100;</span> Profile</a>
         </nav>
-        <div class="sidebar-footer">
-            <a href="#" id="logoutBtn"><span class="icon">&#8592;</span> Logout</a>
-        </div>
+        <div class="sidebar-footer"><a href="#" id="logoutBtn"><span class="icon">&#8592;</span> Logout</a></div>
     </aside>
-
     <div class="main-content">
         <header class="navbar">
-            <div class="navbar-left">
-                <button class="menu-toggle" id="menuToggle">&#9776;</button>
-                <h1 class="page-title">Categories</h1>
-            </div>
-            <div class="navbar-right">
-                <div class="navbar-user">
-                    <div class="user-avatar" id="userAvatar">U</div>
-                    <div class="user-info">
-                        <div class="user-name" id="userName">User</div>
-                        <div class="user-email" id="userEmail">user@example.com</div>
-                    </div>
-                </div>
-            </div>
+            <div class="navbar-left"><button class="menu-toggle" id="menuToggle">&#9776;</button><h1 class="page-title">Categories</h1></div>
+            <div class="navbar-right"><div class="navbar-user"><div class="user-avatar" id="userAvatar">U</div><div class="user-info"><div class="user-name" id="userName">User</div><div class="user-email" id="userEmail">user@example.com</div></div></div></div>
         </header>
-
         <div class="page-content">
             <div id="errorAlert" class="alert alert-danger"></div>
             <div id="successAlert" class="alert alert-success"></div>
-
             <div class="content-grid">
                 <div class="card">
-                    <div class="card-header">
-                        <h3 id="categoryFormTitle">Create Category</h3>
-                    </div>
+                    <div class="card-header"><h3 id="catFormTitle">Create Category</h3></div>
                     <div class="card-body">
                         <form id="categoryForm">
                             <input type="hidden" id="editCategoryId" value="">
-                            <div class="form-group">
-                                <label for="categoryName">Category Name</label>
-                                <input type="text" id="categoryName" class="form-control" placeholder="e.g. Food, Transport" required minlength="1">
-                            </div>
+                            <div class="form-group"><label for="categoryName">Category Name</label><input type="text" id="categoryName" class="form-control" placeholder="e.g. Food" required></div>
                             <div class="form-actions">
-                                <button type="submit" class="btn btn-primary" id="saveCategoryBtn">Create Category</button>
-                                <button type="button" class="btn btn-outline" id="cancelCategoryEditBtn" style="display:none;">Cancel</button>
+                                <button type="submit" class="btn btn-primary" id="saveCategoryBtn">Create</button>
+                                <button type="button" class="btn btn-outline" id="cancelCatEditBtn" style="display:none;">Cancel</button>
                             </div>
                         </form>
                     </div>
                 </div>
-
                 <div class="card">
-                    <div class="card-header">
-                        <h3>Your Categories</h3>
-                    </div>
+                    <div class="card-header"><h3>Your Categories</h3></div>
                     <div class="card-body">
-                        <div id="loadingCategories" class="loading">
-                            <div class="spinner"></div>
-                            Loading...
-                        </div>
-                        <div class="table-container">
-                            <table>
-                                <thead>
-                                    <tr>
-                                        <th>#</th>
-                                        <th>Category Name</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="categoriesBody"></tbody>
-                            </table>
-                        </div>
-                        <div id="categoriesEmpty" class="empty-state" style="display:none;">
-                            <div class="empty-icon">&#128466;</div>
-                            <h4>No categories yet</h4>
-                            <p>Create your first category to start organizing expenses.</p>
-                        </div>
+                        <div id="loadingCategories" class="loading"><div class="spinner"></div>Loading...</div>
+                        <div class="table-container"><table><thead><tr><th>Name</th><th>Type</th><th>Actions</th></tr></thead><tbody id="categoriesBody"></tbody></table></div>
+                        <div id="categoriesEmpty" class="empty-state" style="display:none;"><div class="empty-icon">&#128466;</div><h4>No categories</h4></div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-
     <script src="js/api.js"></script>
     <script src="js/auth.js"></script>
     <script src="js/categories.js"></script>
