@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Expenses - Expense Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <h2><span>$</span> ExpenseTracker</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html"><span class="icon">&#9632;</span> Dashboard</a>
+            <a href="categories.html"><span class="icon">&#9776;</span> Categories</a>
+            <a href="expenses.html" class="active"><span class="icon">&#36;</span> Expenses</a>
+            <a href="income.html"><span class="icon">&#8593;</span> Income</a>
+            <a href="budgets.html"><span class="icon">&#128176;</span> Budgets</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" id="logoutBtn"><span class="icon">&#8592;</span> Logout</a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="navbar">
+            <div class="navbar-left">
+                <button class="menu-toggle" id="menuToggle">&#9776;</button>
+                <h1 class="page-title">Expenses</h1>
+            </div>
+            <div class="navbar-right">
+                <div class="navbar-user">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">User</div>
+                        <div class="user-email" id="userEmail">user@example.com</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div id="errorAlert" class="alert alert-danger"></div>
+            <div id="successAlert" class="alert alert-success"></div>
+
+            <div class="content-grid">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 id="formTitle">Add Expense</h3>
+                    </div>
+                    <div class="card-body">
+                        <form id="expenseForm">
+                            <input type="hidden" id="editExpenseId" value="">
+
+                            <div class="form-group">
+                                <label for="expenseCategory">Category</label>
+                                <select id="expenseCategory" class="form-control" required>
+                                    <option value="">Select a category</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseTitle">Title</label>
+                                <input type="text" id="expenseTitle" class="form-control" placeholder="e.g. Groceries" required minlength="1">
+                            </div>
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="expenseAmount">Amount</label>
+                                    <input type="number" id="expenseAmount" class="form-control" placeholder="0.00" step="0.01" min="0.01" required>
+                                </div>
+                                <div class="form-group">
+                                    <label for="expenseDate">Date</label>
+                                    <input type="date" id="expenseDate" class="form-control" required>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label for="expenseNotes">Notes</label>
+                                <textarea id="expenseNotes" class="form-control" placeholder="Optional notes"></textarea>
+                            </div>
+                            <div class="form-actions">
+                                <button type="submit" class="btn btn-primary" id="saveExpenseBtn">Add Expense</button>
+                                <button type="button" class="btn btn-outline" id="cancelEditBtn" style="display:none;">Cancel</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <div class="card-header">
+                        <h3>Your Expenses</h3>
+                    </div>
+                    <div class="card-body">
+                        <div id="loadingExpenses" class="loading">
+                            <div class="spinner"></div>
+                            Loading...
+                        </div>
+                        <div class="table-container">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Title</th>
+                                        <th>Category</th>
+                                        <th>Amount</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="expensesBody"></tbody>
+                            </table>
+                        </div>
+                        <div id="expensesEmpty" class="empty-state" style="display:none;">
+                            <div class="empty-icon">&#128466;</div>
+                            <h4>No expenses yet</h4>
+                            <p>Add your first expense using the form.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/expenses.js"></script>
+</body>
+</html>

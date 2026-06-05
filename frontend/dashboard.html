@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard - Expense Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <h2><span>$</span> ExpenseTracker</h2>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="active"><span class="icon">&#9632;</span> Dashboard</a>
+            <a href="categories.html"><span class="icon">&#9776;</span> Categories</a>
+            <a href="expenses.html"><span class="icon">&#36;</span> Expenses</a>
+            <a href="income.html"><span class="icon">&#8593;</span> Income</a>
+            <a href="budgets.html"><span class="icon">&#128176;</span> Budgets</a>
+        </nav>
+        <div class="sidebar-footer">
+            <a href="#" id="logoutBtn"><span class="icon">&#8592;</span> Logout</a>
+        </div>
+    </aside>
+
+    <div class="main-content">
+        <header class="navbar">
+            <div class="navbar-left">
+                <button class="menu-toggle" id="menuToggle">&#9776;</button>
+                <h1 class="page-title">Dashboard</h1>
+            </div>
+            <div class="navbar-right">
+                <div class="navbar-user">
+                    <div class="user-avatar" id="userAvatar">U</div>
+                    <div class="user-info">
+                        <div class="user-name" id="userName">User</div>
+                        <div class="user-email" id="userEmail">user@example.com</div>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <div class="page-content">
+            <div id="loadingIndicator" class="loading">
+                <div class="spinner"></div>
+                Loading dashboard...
+            </div>
+
+            <div id="dashboardContent" style="display:none;">
+                <div class="stat-grid" id="statCards">
+                    <div class="stat-card">
+                        <div class="stat-icon red">&#36;</div>
+                        <div class="stat-label">Total Expenses</div>
+                        <div class="stat-value" id="statExpenses">$0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">&#8593;</div>
+                        <div class="stat-label">Total Income</div>
+                        <div class="stat-value" id="statIncome">$0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">&#128176;</div>
+                        <div class="stat-label">Budget</div>
+                        <div class="stat-value" id="statBudget">$0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon yellow">&#8722;</div>
+                        <div class="stat-label">Remaining Budget</div>
+                        <div class="stat-value" id="statRemaining">$0</div>
+                        <div class="stat-sub" id="statRemainingSub"></div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon blue">&#35;</div>
+                        <div class="stat-label">Expense Count</div>
+                        <div class="stat-value" id="statExpenseCount">0</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon green">&#35;</div>
+                        <div class="stat-label">Income Count</div>
+                        <div class="stat-value" id="statIncomeCount">0</div>
+                    </div>
+                </div>
+
+                <div class="content-grid">
+                    <div class="full-width card">
+                        <div class="card-header">
+                            <h3>Recent Expenses</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="table-container">
+                                <table>
+                                    <thead>
+                                        <tr>
+                                            <th>Title</th>
+                                            <th>Category</th>
+                                            <th>Amount</th>
+                                            <th>Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="recentExpensesBody">
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div id="recentEmpty" class="empty-state">
+                                <div class="empty-icon">&#128466;</div>
+                                <h4>No expenses yet</h4>
+                                <p>Start tracking your expenses today.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="full-width card">
+                        <div class="card-header">
+                            <h3>Quick Actions</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="quick-actions">
+                                <a href="expenses.html" class="quick-action">&#43; Add Expense</a>
+                                <a href="income.html" class="quick-action">&#43; Add Income</a>
+                                <a href="categories.html" class="quick-action">&#43; Add Category</a>
+                                <a href="budgets.html" class="quick-action">&#43; Set Budget</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/dashboard.js"></script>
+</body>
+</html>

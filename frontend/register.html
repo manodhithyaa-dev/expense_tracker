@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register - Expense Tracker</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div class="auth-page">
+        <div class="auth-card">
+            <div class="auth-logo">
+                <h1><span>$</span> ExpenseTracker</h1>
+                <p>Create your account</p>
+            </div>
+            <div class="auth-title">
+                <h2>Get Started</h2>
+            </div>
+
+            <div id="errorAlert" class="alert alert-danger"></div>
+            <div id="successAlert" class="alert alert-success"></div>
+
+            <form id="registerForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="name">Name</label>
+                        <input type="text" id="name" class="form-control" placeholder="Your name" required minlength="2">
+                    </div>
+                    <div class="form-group">
+                        <label for="age">Age</label>
+                        <input type="number" id="age" class="form-control" placeholder="Your age" min="1" max="119">
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" class="form-control" placeholder="you@example.com" required>
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" class="form-control" placeholder="At least 6 characters" required minlength="6">
+                </div>
+                <button type="submit" class="btn btn-primary btn-block" id="registerBtn">
+                    Create Account
+                </button>
+            </form>
+
+            <div class="auth-link">
+                Already have an account? <a href="login.html">Sign In</a>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        document.getElementById('registerForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const btn = document.getElementById('registerBtn');
+            const errorEl = document.getElementById('errorAlert');
+            const successEl = document.getElementById('successAlert');
+
+            const name = document.getElementById('name').value.trim();
+            const age = document.getElementById('age').value.trim();
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+
+            errorEl.className = 'alert alert-danger';
+            successEl.className = 'alert alert-success';
+
+            if (!name || !email || !password) {
+                errorEl.textContent = 'Please fill in all required fields.';
+                errorEl.className = 'alert alert-danger show';
+                return;
+            }
+
+            if (name.length < 2) {
+                errorEl.textContent = 'Name must be at least 2 characters.';
+                errorEl.className = 'alert alert-danger show';
+                return;
+            }
+
+            if (password.length < 6) {
+                errorEl.textContent = 'Password must be at least 6 characters.';
+                errorEl.className = 'alert alert-danger show';
+                return;
+            }
+
+            btn.disabled = true;
+            btn.textContent = 'Creating account...';
+
+            try {
+                const payload = { name, email, password };
+                if (age) payload.age = parseInt(age);
+
+                await post('/users', payload);
+                successEl.textContent = 'Account created! Redirecting to login...';
+                successEl.className = 'alert alert-success show';
+                document.getElementById('registerForm').reset();
+
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            } catch (err) {
+                errorEl.textContent = err.message;
+                errorEl.className = 'alert alert-danger show';
+            } finally {
+                btn.disabled = false;
+                btn.textContent = 'Create Account';
+            }
+        });
+    </script>
+</body>
+</html>
